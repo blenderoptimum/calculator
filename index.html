@@ -4,78 +4,201 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Material Price Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    /* General reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f7fc;
+      color: #333;
+      line-height: 1.6;
+      padding: 30px;
     }
+
     .container {
-      max-width: 600px;
+      display: flex;
+      max-width: 1200px;
       margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
+    .left-side {
+      flex: 1;
+      padding-right: 20px;
+      border-right: 2px solid #ddd;
+    }
+
+    .right-side {
+      flex: 1;
+      padding-left: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
     label {
       display: block;
       margin: 10px 0 5px;
+      font-weight: 500;
     }
+
     input, select, button {
       width: 100%;
-      padding: 8px;
-      margin: 5px 0;
+      padding: 12px;
+      margin: 8px 0;
       font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      transition: 0.3s ease;
     }
-    #result {
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result, #totalSum {
+      font-size: 20px;
       font-weight: bold;
-      font-size: 18px;
+      color: #4CAF50;
+      margin-top: 15px;
     }
+
+    .info, .error {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .info {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .calculation-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .remove-btn {
+      background-color: #dcdcdc; /* Subtle gray color */
+      color: #333;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #b3b3b3; /* Slightly darker gray on hover */
+    }
+
     #calculations {
+      margin-top: 30px;
+    }
+
+    #totalSum {
       margin-top: 20px;
+      color: #333;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 15px;
+      }
+      .left-side, .right-side {
+        flex: unset;
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Material Price Calculator</h1>
+    <div class="left-side">
+      <h1>Material Price Calculator</h1>
 
-    <!-- Inputs -->
-    <label for="width">Width (mm):</label>
-    <input type="number" id="width" value="1">
-    
-    <label for="height">Height (mm):</label>
-    <input type="number" id="height" value="1">
-    
-    <label for="quantity">Quantity:</label>
-    <input type="number" id="quantity" value="1">
-    
-    <label for="material">Select Material:</label>
-    <select id="material">
-      <option value="Stickers">Stickers</option>
-      <option value="Chromodeck">Chromodeck</option>
-      <option value="ABS">ABS</option>
-      <option value="Correx">Correx</option>
-    </select>
-    
-    <label for="unit">Select Unit:</label>
-    <select id="unit">
-      <option value="mm">mm</option>
-      <option value="cm">cm</option>
-      <option value="m">m</option>
-    </select>
-    
-    <!-- Buttons -->
-    <button onclick="calculatePrice()">Calculate</button>
-    <button onclick="addTax()">Add Tax (15%)</button>
-    
-    <div id="result">Total Price: R0.00</div>
+      <!-- Inputs -->
+      <label for="width">Width (mm):</label>
+      <input type="number" id="width" value="1" placeholder="Enter width in mm">
+      
+      <label for="height">Height (mm):</label>
+      <input type="number" id="height" value="1" placeholder="Enter height in mm">
+      
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" value="1" placeholder="Enter quantity">
 
-    <h3>List of Calculations:</h3>
-    <pre id="calculations"></pre>
+      <label for="material">Select Material:</label>
+      <select id="material">
+        <option value="Stickers">Stickers</option>
+        <option value="Chromodeck">Chromodeck</option>
+        <option value="ABS">ABS</option>
+        <option value="Correx">Correx</option>
+      </select>
+      
+      <label for="unit">Select Unit:</label>
+      <select id="unit">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="m">m</option>
+      </select>
+      
+      <!-- Buttons -->
+      <button onclick="calculatePrice()">Calculate</button>
+      <button onclick="addTax()">Add Tax (15%)</button>
+      
+      <div id="result">Total Price: R0.00</div>
+      <div id="message"></div>
+    </div>
+
+    <div class="right-side">
+      <h3>List of Calculations:</h3>
+      <div id="calculations"></div>
+
+      <h3>Total Sum: <span id="totalSum">R0.00</span></h3>
+    </div>
   </div>
 
   <script>
     let calculatedDetails = [];
+    let totalPriceBeforeTax = 0; // Track total price before tax
 
+    // Function to calculate the price
     function calculatePrice() {
-      // Get input values
       let width = parseFloat(document.getElementById('width').value);
       let height = parseFloat(document.getElementById('height').value);
       let quantity = parseInt(document.getElementById('quantity').value);
@@ -91,59 +214,78 @@
         height /= 1000;
       }
 
-      // Calculate price
       let price = 0;
-      let formula = "";
       if (material === "Stickers") {
         price = (width * height * 320) * quantity;
-        formula = "(Width x Height x 320) x Quantity";
       } else if (material === "Chromodeck") {
         price = (width * height * 150 * 1.4 * 1.15) * quantity;
-        formula = "(Width x Height x 150 x 1.4 x 1.15) x Quantity";
       } else if (material === "ABS") {
         price = (width * height * 100 * 1.4 * 1.15) * quantity;
-        formula = "(Width x Height x 100 x 1.4 x 1.15) x Quantity";
       } else if (material === "Correx") {
         price = (width * height * 100) * quantity;
-        formula = "(Width x Height x 100) x Quantity";
       }
 
-      // Update the result
-      document.getElementById('result').innerText = `Total Price: R${price.toFixed(2)}`;
-      
-      // Store the calculation details
       let calculation = {
         material,
         width,
         height,
         quantity,
-        price,
-        formula
+        price
       };
-      calculatedDetails.push(calculation);
 
-      // Update calculations list
+      calculatedDetails.push(calculation);
+      totalPriceBeforeTax += price; // Update total price before tax
+
+      document.getElementById('result').innerText = `Total Price: R${totalPriceBeforeTax.toFixed(2)}`;
       updateCalculations();
+      document.getElementById('message').innerHTML = '<span class="info">Calculation done successfully!</span>';
     }
 
+    // Function to add tax to the final sum only
     function addTax() {
       if (calculatedDetails.length > 0) {
-        let lastCalculation = calculatedDetails[calculatedDetails.length - 1];
-        let priceWithTax = lastCalculation.price * 1.15;
-        lastCalculation.price = priceWithTax;
-        document.getElementById('result').innerText = `Total Price (with Tax): R${priceWithTax.toFixed(2)}`;
+        let totalWithTax = totalPriceBeforeTax * 1.15;
+        document.getElementById('result').innerText = `Total Price (with Tax): R${totalWithTax.toFixed(2)}`;
         updateCalculations();
+
+        document.getElementById('message').innerHTML = '<span class="info">Tax added successfully!</span>';
       } else {
-        alert("Please calculate the price first");
+        document.getElementById('message').innerHTML = '<span class="error">Please calculate the price first.</span>';
       }
     }
 
+    // Function to update the calculations list and show total sum
     function updateCalculations() {
-      let calculationsText = calculatedDetails.map(detail => {
-        return `${detail.material}: ${detail.width}m x ${detail.height}m x ${detail.quantity} x Price = R${detail.price.toFixed(2)} (${detail.formula})`;
-      }).join("\n");
+      let calculationsText = '';
+      calculatedDetails.forEach((detail, index) => {
+        calculationsText += `<div class="calculation-item">
+                              <div>${detail.width}m x ${detail.height}m x ${detail.quantity} x Price = R${detail.price.toFixed(2)}</div>
+                              <button class="remove-btn" onclick="removeCalculation(${index})">Remove</button>
+                             </div>`;
+      });
 
-      document.getElementById('calculations').innerText = calculationsText;
+      document.getElementById('calculations').innerHTML = calculationsText;
+
+      // Show the total sum before tax
+      document.getElementById('totalSum').innerText = `R${totalPriceBeforeTax.toFixed(2)}`;
+    }
+
+    // Function to remove a calculation from the list
+    function removeCalculation(index) {
+      let removedCalculation = calculatedDetails.splice(index, 1)[0];
+      totalPriceBeforeTax -= removedCalculation.price; // Adjust total price before tax
+      updateCalculations();
+      document.getElementById('message').innerHTML = '<span class="info">Calculation removed successfully!</span>';
+    }
+
+    // Function to clear the calculations
+    function clearCalculations() {
+      calculatedDetails = [];
+      totalPriceBeforeTax = 0; // Reset the total price before tax
+      document.getElementById('calculations').innerText = "";
+      document.getElementById('totalSum').innerText = "R0.00";
+      document.getElementById('result').innerText = "Total Price: R0.00";
+      document.getElementById('message').innerHTML = '<span class="info">All calculations cleared.</span>';
     }
   </script>
 </body>
