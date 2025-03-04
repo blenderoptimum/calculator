@@ -6,12 +6,12 @@
   <title>Material Price Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* General reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f4f7fc;
@@ -135,16 +135,36 @@
       color: #333;
     }
 
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        padding: 15px;
-      }
-      .left-side, .right-side {
-        flex: unset;
-        padding: 10px;
-      }
+    /* Print slip styling */
+    .print-slip {
+      display: none;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
     }
+
+    .print-slip h2 {
+      color: #4CAF50;
+    }
+
+    .print-slip .calculation-item {
+      background-color: #f1f1f1;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .print-slip .total {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
   </style>
 </head>
 <body>
@@ -180,6 +200,7 @@
       <!-- Buttons -->
       <button onclick="calculatePrice()">Calculate</button>
       <button onclick="addTax()">Add Tax (15%)</button>
+      <button onclick="generatePrintSlip()">Generate Print Slip</button>
       
       <div id="result">Total Price: R0.00</div>
       <div id="message"></div>
@@ -190,14 +211,24 @@
       <div id="calculations"></div>
 
       <h3>Total Sum: <span id="totalSum">R0.00</span></h3>
+
+      <!-- Download Slip Button -->
+      <button id="downloadButton" onclick="downloadSlip()" style="display:none;">Download Slip</button>
     </div>
   </div>
 
+  <!-- Print Slip Layout -->
+  <div class="print-slip" id="print-slip">
+    <h2>Price Calculation Slip</h2>
+    <div id="print-calculations"></div>
+    <div class="total">Total Sum: R<span id="print-total">0.00</span></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
   <script>
     let calculatedDetails = [];
-    let totalPriceBeforeTax = 0; // Track total price before tax
+    let totalPriceBeforeTax = 0;
 
-    // Function to calculate the price
     function calculatePrice() {
       let width = parseFloat(document.getElementById('width').value);
       let height = parseFloat(document.getElementById('height').value);
@@ -205,7 +236,6 @@
       let material = document.getElementById('material').value;
       let unit = document.getElementById('unit').value;
 
-      // Convert units to meters
       if (unit === "cm") {
         width /= 100;
         height /= 100;
@@ -234,14 +264,13 @@
       };
 
       calculatedDetails.push(calculation);
-      totalPriceBeforeTax += price; // Update total price before tax
+      totalPriceBeforeTax += price;
 
       document.getElementById('result').innerText = `Total Price: R${totalPriceBeforeTax.toFixed(2)}`;
       updateCalculations();
       document.getElementById('message').innerHTML = '<span class="info">Calculation done successfully!</span>';
     }
 
-    // Function to add tax to the final sum only
     function addTax() {
       if (calculatedDetails.length > 0) {
         let totalWithTax = totalPriceBeforeTax * 1.15;
@@ -250,42 +279,67 @@
 
         document.getElementById('message').innerHTML = '<span class="info">Tax added successfully!</span>';
       } else {
-        document.getElementById('message').innerHTML = '<span class="error">Please calculate the price first.</span>';
+        document.getElementById('message').innerHTML = '<span class="error">No calculation to add tax to!</span>';
       }
     }
 
-    // Function to update the calculations list and show total sum
     function updateCalculations() {
-      let calculationsText = '';
-      calculatedDetails.forEach((detail, index) => {
-        calculationsText += `<div class="calculation-item">
-                              <div>${detail.width}m x ${detail.height}m x ${detail.quantity} x Price = R${detail.price.toFixed(2)}</div>
-                              <button class="remove-btn" onclick="removeCalculation(${index})">Remove</button>
-                             </div>`;
+      let calculationsDiv = document.getElementById('calculations');
+      calculationsDiv.innerHTML = '';
+      calculatedDetails.forEach((calc, index) => {
+        let item = document.createElement('div');
+        item.classList.add('calculation-item');
+        item.innerHTML = `
+          ${calc.material}: ${calc.width}m x ${calc.height}m x ${calc.quantity} x Price = R${calc.price.toFixed(2)}
+          <button class="remove-btn" onclick="removeCalculation(${index})">Remove</button>
+        `;
+        calculationsDiv.appendChild(item);
       });
 
-      document.getElementById('calculations').innerHTML = calculationsText;
-
-      // Show the total sum before tax
-      document.getElementById('totalSum').innerText = `R${totalPriceBeforeTax.toFixed(2)}`;
+      let totalSum = totalPriceBeforeTax;
+      document.getElementById('totalSum').innerText = `R${totalSum.toFixed(2)}`;
     }
 
-    // Function to remove a calculation from the list
     function removeCalculation(index) {
-      let removedCalculation = calculatedDetails.splice(index, 1)[0];
-      totalPriceBeforeTax -= removedCalculation.price; // Adjust total price before tax
+      totalPriceBeforeTax -= calculatedDetails[index].price;
+      calculatedDetails.splice(index, 1);
       updateCalculations();
-      document.getElementById('message').innerHTML = '<span class="info">Calculation removed successfully!</span>';
     }
 
-    // Function to clear the calculations
-    function clearCalculations() {
-      calculatedDetails = [];
-      totalPriceBeforeTax = 0; // Reset the total price before tax
-      document.getElementById('calculations').innerText = "";
-      document.getElementById('totalSum').innerText = "R0.00";
-      document.getElementById('result').innerText = "Total Price: R0.00";
-      document.getElementById('message').innerHTML = '<span class="info">All calculations cleared.</span>';
+    function generatePrintSlip() {
+      let printSlip = document.getElementById('print-slip');
+      let printCalculations = document.getElementById('print-calculations');
+      let printTotal = document.getElementById('print-total');
+
+      printCalculations.innerHTML = '';
+      calculatedDetails.forEach((calc) => {
+        let item = document.createElement('div');
+        item.classList.add('calculation-item');
+        item.innerText = `${calc.material}: ${calc.width}m x ${calc.height}m x ${calc.quantity} x Price = R${calc.price.toFixed(2)}`;
+        printCalculations.appendChild(item);
+      });
+
+      printTotal.innerText = totalPriceBeforeTax.toFixed(2);
+
+      // Make the print-slip div visible
+      printSlip.style.display = 'block';
+
+      // Show the download button after generating the slip
+      document.getElementById('downloadButton').style.display = 'inline-block';
+    }
+
+    function downloadSlip() {
+      let printSlip = document.getElementById('print-slip');
+
+      // Capture the print slip as a JPEG image
+      html2canvas(printSlip).then(function(canvas) {
+        canvas.toBlob(function(blob) {
+          let link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'price_calculation_slip.jpg'; // Name the file
+          link.click();
+        }, 'image/jpeg');
+      });
     }
   </script>
 </body>
