@@ -6,7 +6,7 @@
   <title>Material Price Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* Styles are mostly the same, ensuring consistent layout */
+    /* Styles for the layout and responsiveness */
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f4f7fc;
@@ -42,6 +42,13 @@
       color: #4CAF50;
       font-weight: 600;
       margin-bottom: 20px;
+    }
+
+    /* Logo Style */
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 200px; /* Adjust the size of your logo */
     }
 
     label {
@@ -131,73 +138,31 @@
       color: #333;
     }
 
-    /* Mobile Responsiveness */
+    /* Styles for mobile responsiveness */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
-        padding: 15px;
+        align-items: center;
       }
 
       .left-side, .right-side {
-        flex: none;
-        width: 100%;
-        padding: 0;
-        margin-bottom: 20px;
+        padding-right: 0;
+        padding-left: 0;
+        border-right: none;
+        border-bottom: 2px solid #ddd;
       }
 
-      h1 {
-        font-size: 24px;
-        margin-bottom: 15px;
-      }
-
-      input, select, button {
-        font-size: 14px;
-        padding: 10px;
-      }
-
-      #result, #totalSum {
-        font-size: 18px;
-      }
-
-      .calculation-item {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 12px;
-        margin-bottom: 10px;
-      }
-
-      .remove-btn {
-        margin-top: 8px;
-        width: 100%;
-      }
-
-      #calculations {
-        margin-top: 20px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 20px;
-        margin-bottom: 10px;
-      }
-
-      input, select, button {
-        font-size: 12px;
-        padding: 8px;
-      }
-
-      #result, #totalSum {
-        font-size: 16px;
-      }
-
-      .calculation-item {
-        padding: 8px;
+      button {
+        width: auto;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Display the logo -->
+  <img src="https://github.com/blenderoptimum/calculator/blob/main/LOGO.png?raw=true" alt="Your Logo" class="logo">
+  
+  <!-- Main container for the calculator -->
   <div class="container">
     <div class="left-side">
       <h1>Material Price Calculator</h1>
@@ -241,6 +206,24 @@
     </div>
   </div>
 
+  <!-- Modal for instructions -->
+  <div id="instructionsModal" style="display: none;">
+    <div>
+      <h2>How to Use the Material Price Calculator</h2>
+      <p>This calculator helps you calculate the cost of different materials based on their dimensions and quantity.</p>
+      <p>Steps to use:</p>
+      <ol>
+        <li>Enter the width and height of the material in your preferred unit (mm, cm, or m).</li>
+        <li>Select the material you want to calculate the price for (Stickers, Chromodeck, ABS, or Correx).</li>
+        <li>Enter the quantity of the material you need.</li>
+        <li>Click "Calculate" to get the total price.</li>
+        <li>Click "Add Tax" to include a 15% tax in the calculation.</li>
+      </ol>
+      <button onclick="closeInstructions()">Close</button>
+    </div>
+  </div>
+
+  <!-- Script for functionality -->
   <script>
     let calculatedDetails = [];
     let totalPriceBeforeTax = 0;
@@ -320,6 +303,14 @@
       totalPriceBeforeTax -= calculatedDetails[index].price;
       calculatedDetails.splice(index, 1);
       updateCalculations();
+    }
+
+    function showInstructions() {
+      document.getElementById('instructionsModal').style.display = 'block';
+    }
+
+    function closeInstructions() {
+      document.getElementById('instructionsModal').style.display = 'none';
     }
   </script>
 </body>
