@@ -182,6 +182,13 @@
         <option value="Chromodeck">Chromodeck</option>
         <option value="ABS">ABS</option>
         <option value="Correx">Correx</option>
+        <option value="UV Pro">UV Pro</option>
+        <option value="Laminated">Laminated</option>
+        <option value="3M">3M</option>
+        <option value="Magnet">Magnet</option>
+        <option value="Reflective">Reflective</option>
+        <option value="Banner">Banner</option>
+        <option value="Poster">Poster</option>
       </select>
       
       <label for="unit">Select Unit:</label>
@@ -193,6 +200,7 @@
       
       <button onclick="calculatePrice()">Calculate</button>
       <button onclick="addTax()">Add Tax (15%)</button>
+      <button onclick="resetCalculator()">Reset</button>
       
       <div id="result">Total Price: R0.00</div>
       <div id="message"></div>
@@ -214,7 +222,7 @@
       <p>Steps to use:</p>
       <ol>
         <li>Enter the width and height of the material in your preferred unit (mm, cm, or m).</li>
-        <li>Select the material you want to calculate the price for (Stickers, Chromodeck, ABS, or Correx).</li>
+        <li>Select the material you want to calculate the price for (Stickers, Chromodeck, ABS, Correx, UV Pro, Laminated, 3M, Magnet, Reflective, Banner, or Poster).</li>
         <li>Enter the quantity of the material you need.</li>
         <li>Click "Calculate" to get the total price.</li>
         <li>Click "Add Tax" to include a 15% tax in the calculation.</li>
@@ -252,6 +260,20 @@
         price = (width * height * 100 * 1.4 * 1.15) * quantity;
       } else if (material === "Correx") {
         price = (width * height * 100) * quantity;
+      } else if (material === "UV Pro") {
+        price = (width * height * 60 * 1.4) * quantity;
+      } else if (material === "Laminated") {
+        price = (width * height * 200 * 1.4) * quantity;
+      } else if (material === "3M") {
+        price = (width * height * 1351) * quantity;
+      } else if (material === "Magnet") {
+        price = (width * height * 600) * quantity;
+      } else if (material === "Reflective") {
+        price = (width * height * 600) * quantity;
+      } else if (material === "Banner") {
+        price = (width * height * 320) * quantity;
+      } else if (material === "Poster") {
+        price = (width * height * 120) * quantity;
       }
 
       let calculation = {
@@ -288,10 +310,9 @@
       calculatedDetails.forEach((calc, index) => {
         let item = document.createElement('div');
         item.classList.add('calculation-item');
-        item.innerHTML = `
-          ${calc.material}: ${calc.width}m x ${calc.height}m x ${calc.quantity} x Price = R${calc.price.toFixed(2)}
-          <button class="remove-btn" onclick="removeCalculation(${index})">Remove</button>
-        `;
+        item.innerHTML = 
+          `${calc.material}: ${calc.width}m x ${calc.height}m x ${calc.quantity} x Price = R${calc.price.toFixed(2)}`
+          + `<button class="remove-btn" onclick="removeCalculation(${index})">Remove</button>`;
         calculationsDiv.appendChild(item);
       });
 
@@ -311,6 +332,22 @@
 
     function closeInstructions() {
       document.getElementById('instructionsModal').style.display = 'none';
+    }
+
+    function resetCalculator() {
+      document.getElementById('width').value = 1;
+      document.getElementById('height').value = 1;
+      document.getElementById('quantity').value = 1;
+      document.getElementById('material').value = "Stickers";
+      document.getElementById('unit').value = "mm";
+      
+      calculatedDetails = [];
+      totalPriceBeforeTax = 0;
+
+      document.getElementById('result').innerText = "Total Price: R0.00";
+      document.getElementById('totalSum').innerText = "R0.00";
+      document.getElementById('calculations').innerHTML = '';
+      document.getElementById('message').innerHTML = '';
     }
   </script>
 </body>
